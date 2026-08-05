@@ -31,7 +31,7 @@
  */
 const BASE = new URL('./', self.location).pathname;
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = `dayspine-shell-${VERSION}`;
 const ASSETS = `dayspine-assets-${VERSION}`;
 const KEEP = [SHELL, ASSETS];
@@ -85,7 +85,22 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       (async () => {
         try {
-          const fresh = await fetch(request);
+          /*
+           * `cache: 'no-store'` is doing the real work here.
+           *
+           * A plain `fetch(request)` inside a service worker still goes through
+           * the HTTP cache, and GitHub Pages serves index.html with
+           * `Cache-Control: max-age=600`. So "network-first" quietly returned a
+           * ten-minute-old shell — which points at the previous build's
+           * content-hashed bundle, which is then served cache-first because its
+           * URL has not changed. Net effect: a deploy took up to ten minutes to
+           * reach an already-open app, and a test that reopened it immediately
+           * saw the old version with no indication anything was stale.
+           *
+           * The shell is ~1 kB. Always fetching it fresh costs nothing and is
+           * the only thing that makes a deploy visible on the next launch.
+           */
+          const fresh = await fetch(request.url, { cache: 'no-store' });
           const cache = await caches.open(SHELL);
           cache.put(BASE, fresh.clone());
           return fresh;
