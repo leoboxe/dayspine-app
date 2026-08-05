@@ -1,0 +1,28 @@
+# Cloudflare Pages / Netlify header rules.
+# The Vercel equivalent is vercel.json at the repo root — keep the two in sync.
+#
+# Note what is NOT here: Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy.
+# An earlier version of this port needed both, because expo-sqlite's web backend
+# runs SQLite in a worker over SharedArrayBuffer, which browsers only expose to
+# cross-origin-isolated pages. That was abandoned (see src/db/driver.web.ts), and
+# dropping it matters commercially as well as technically: COEP require-corp
+# blocks cross-origin subresources that do not opt in, including ad pixels. This
+# app can now sit on the same origin as the marketing site and its Meta pixel.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+
+# Never let a browser hold an old service worker.
+/sw.js
+  Cache-Control: no-cache
+
+# Metro content-hashes these filenames, so the bytes behind a URL never change.
+/_expo/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Same reasoning, but versioned by package.json rather than by hash — so it is
+# revalidated rather than pinned for a year.
+/sqljs/*
+  Cache-Control: public, max-age=604800

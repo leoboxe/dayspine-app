@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>Dayspine</title>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: 100%;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+      <!-- dayspine:pwa -->
+    <meta name="description" content="Six trackers, one timeline. Meals, lifts, cardio, fasting, recovery and mindset in one app." />
+    <link rel="manifest" href="/dayspine-app/manifest.webmanifest" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- Safari still reads its own tags rather than the manifest for launch. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Dayspine" />
+    <link rel="apple-touch-icon" href="/dayspine-app/icons/apple-touch-icon.png" />
+    <link rel="icon" href="/dayspine-app/icons/icon-192.png" />
+    <script>window.__DAYSPINE_BASE__ = "/dayspine-app/";</script>
+  </head>
+
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  <script src="/dayspine-app/_expo/static/js/web/entry-aa24b34d1b5da0e7448e52fc58f8a9e6.js" defer></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker
+            .register(window.__DAYSPINE_BASE__ + 'sw.js', { scope: window.__DAYSPINE_BASE__ })
+            .catch(function (e) {
+              console.warn('[dayspine] service worker registration failed', e);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
