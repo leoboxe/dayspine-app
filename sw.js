@@ -42,6 +42,18 @@ self.addEventListener('install', (event) => {
   );
 });
 
+/*
+ * Activate immediately, but ONLY when the app asks.
+ *
+ * A waiting worker normally sits idle until every tab is gone, which for an
+ * installed PWA can be days. `UpdatePrompt` sends this when the user taps
+ * Refresh — never automatically, because swapping code out from under a running
+ * session can lose whatever they were part-way through.
+ */
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
