@@ -35,6 +35,32 @@
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="icon" href="/icons/icon-192.png" />
     <script>window.__DAYSPINE_BASE__ = "/";</script>
+    <script>
+      /*
+       * Catch `beforeinstallprompt` here, in the head, before the bundle exists.
+       *
+       * ⭐ THIS IS WHY THE INSTALL BANNER NEVER APPEARED. Chrome fires the event
+       * within a few hundred milliseconds of load, as soon as it has validated
+       * the manifest and the service worker. Our React listener attaches inside
+       * an effect that cannot run until the fonts, the sql.js wasm, the SQLite
+       * migrations and the legacy purge have all resolved — seconds later, on a
+       * phone. The event had already fired and gone, and the event is single-use
+       * and not replayable, so the banner had nothing to show and silently
+       * rendered nothing. It looked exactly like "the browser doesn't support
+       * installing", which is why it read as correct behaviour.
+       *
+       * Stashed on window, and the component drains it on mount.
+       */
+      window.__dayspineInstallEvent = null;
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        window.__dayspineInstallEvent = e;
+        window.dispatchEvent(new Event('dayspine:installable'));
+      });
+      window.addEventListener('appinstalled', function () {
+        window.__dayspineInstallEvent = null;
+      });
+    </script>
   </head>
 
   <body>
@@ -44,7 +70,7 @@
     </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
-  <script src="/_expo/static/js/web/entry-df279f91b3b4abd78dcd842f7e62d32d.js" defer></script>
+  <script src="/_expo/static/js/web/entry-143c037a116fe17ee5b48d2d56edca53.js" defer></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
