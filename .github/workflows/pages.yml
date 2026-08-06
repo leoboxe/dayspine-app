@@ -1,0 +1,41 @@
+# Publish this repository as-is to GitHub Pages.
+#
+# The legacy Pages builder started failing with `duration: 0` and a bare
+# "Page build failed" — rejected at submission, before it read a single file, so
+# no amount of changing the content could fix it. Five consecutive deploys were
+# lost that way while the site quietly kept serving an older bundle, which is
+# the worst shape a deploy failure can take.
+#
+# This path does not queue behind that builder. It also runs no Jekyll, which is
+# what `.nojekyll` was defending against — the whole app lives under `_expo/`.
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never two deploys at once; cancel an in-flight one rather than racing it.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The repo IS the artifact: it holds the built `dist/` output, not source.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
